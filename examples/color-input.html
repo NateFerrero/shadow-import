@@ -1,0 +1,24 @@
+<!doctype html>
+<head>
+    <title>&lt;shadow-import&gt; Example</title>
+    <script src="../polyfills/webcomponents.min.js"></script>
+    <script src="../shadow-import.js"></script>
+    <shadow-import-base href="/components"></shadow-import-base>
+    <shadow-import tag="color-input" shadow-class="ColorInputElement" template="color-input/component.html"></shadow-import>
+    <shadow-import tag="json-render"></shadow-import>
+</head>
+<body>
+    <color-input border-color="red"></color-input>
+
+    <color-input border-color="purple"></color-input>
+
+    <color-input border-color="blue"></color-input>
+
+    <color-input border-color="green"></color-input>
+
+    <color-input border-color="yellow"></color-input>
+
+    <color-input border-color="orange"></color-input>
+
+    <input value="This is not a custom element" />
+</body>
