@@ -1,6 +1,8 @@
-var ColorInputElement = (function (cls) {
-    var proto = cls.prototype;
+ShadowComponent(function (cls, proto) {
 
+    /**
+     * Constructor
+     */
     proto.init = function (el, attrs) {
         this.el = el;
         this.attrs = attrs;
@@ -27,4 +29,4 @@ var ColorInputElement = (function (cls) {
     };
 
     return cls;
-})(function ColorInputElement () { this.init.apply(this, arguments); });
+});

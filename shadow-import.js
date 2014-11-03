@@ -12,6 +12,24 @@
     shadowImport.renderTemplate = {};
     shadowImport.renderQueue = {};
 
+    var component;
+
+    this.ShadowComponent = function ShadowComponent(fn) {
+        if (component) {
+            throw new Error("ShadowComponent() called outside of <shadow-import> lifecycle");
+        }
+
+        if (typeof fn != 'function') {
+            throw new Error("ShadowComponent() called without a function as the first argument");
+        }
+
+        component = function ShadowComponent () {
+            this.init && this.init.apply(this, arguments);
+        };
+
+        fn(component, component.prototype);
+    };
+
     /**
      * Attributes on the custom element
      */
@@ -127,20 +145,20 @@
              * create a new asychronous template loader function and put it under
              * shadowImport.linkImports[this.template]
              */
-            if (!(elem.template in shadowImport.linkImports)) {
+            if (!(elem.href in shadowImport.linkImports)) {
                 /**
                  * Call this function at any time with a custom element node,
                  * and when the template is available, the shadow DOM will
                  * have the template cloned onto it.
                  */
-                shadowImport.linkImports[elem.template] = function (elem) {
+                shadowImport.linkImports[elem.href] = function (elem) {
 
                     /**
                      * If the template function is ready, just call it now
                      * with the custom element node.
                      */
-                    if (elem.template in shadowImport.renderTemplate) {
-                        shadowImport.renderTemplate[elem.template](elem);
+                    if (elem.href in shadowImport.renderTemplate) {
+                        shadowImport.renderTemplate[elem.href](elem);
                     }
 
                     /**
@@ -148,43 +166,55 @@
                      * is finally loaded.
                      */
                     else {
-                        if (!shadowImport.renderQueue[elem.template]) {
-                            shadowImport.renderQueue[elem.template] = [];
+                        if (!shadowImport.renderQueue[elem.href]) {
+                            shadowImport.renderQueue[elem.href] = [];
                         }
-                        shadowImport.renderQueue[elem.template].push(elem);
+                        shadowImport.renderQueue[elem.href].push(elem);
                     }
                 };
 
                 /**
-                 * Load the template content from the elem.template and instantiate the component class
+                 * Load the template content from the elem.href and instantiate the component class
                  */
-                loadTemplateContent(elem.template, function (templateContent) {
-                    var templateLoaded = shadowImport.renderTemplate[elem.template] = function (elem) {
+                loadTemplateContent(elem.href, function (templateContent) {
+                    /**
+                     * Ensure that the component was registered
+                     */
+                    if (!component) {
+                        throw new Error("ShadowComponent() not called during <shadow-import> tag initialization, should have been included in " + elem.href);
+                    }
+
+                    /**
+                     * Retain a reference to the imported component
+                     */
+                    var CustomClass = component;
+
+                    /**
+                     * Reset the component after use
+                     */
+                    component = null;
+
+                    /**
+                     * Function to call when the template is loaded
+                     */
+                    var templateLoaded = shadowImport.renderTemplate[elem.href] = function (elem) {
                         /**
                          * Clone the template, and append it to the custom element node
                          */
                         elem.shadowRoot.appendChild(templateContent.cloneNode(true));
 
                         /**
-                         * The corresponding shadowClass for the custom element must exist in JavaScript.
+                         * Finally, instantiate the new component class with the custom element node
+                         * and the attribute manager
                          */
-                        if (!window[elem.shadowClass]) {
-                            throw new Error('ShadowImport: Shadow class ' + elem.shadowClass +
-                                ' not found in: ' + elem.template);
-                        }
-
-                        /**
-                         * Finally, instantiate the new component class on the custom element node
-                         */
-                        var CustomClass = window[elem.shadowClass];
                         elem.component = new CustomClass(elem.shadowRoot, elem.shadowAttributes);
                     };
 
                     /**
                      * Process all queued shadow DOM nodes that require this template
                      */
-                    if (Array.isArray(shadowImport.renderQueue[elem.template])) {
-                        shadowImport.renderQueue[elem.template].forEach(templateLoaded);
+                    if (Array.isArray(shadowImport.renderQueue[elem.href])) {
+                        shadowImport.renderQueue[elem.href].forEach(templateLoaded);
                     }
                 });
             }
@@ -193,7 +223,7 @@
              * Initiate the link import process with a template URL and a custom element node
              */
             elem.shadowAttributes = new ShadowAttributes(elem);
-            shadowImport.linkImports[elem.template](elem);
+            shadowImport.linkImports[elem.href](elem);
         };
 
         return customElement;
@@ -228,7 +258,7 @@
          * <shadow-import> tags may define a template attribute, otherwise the default
          * will be used
          */
-        var template = this.attributes.getNamedItem('template');
+        var href = this.attributes.getNamedItem('href');
 
         /**
          * <shadow-import> tags may define a shadow-class attribute, otherwise the default
@@ -244,7 +274,7 @@
          * Create the custom element
          */
         var customElement = this.createCustomElement();
-        customElement.template = template ? template.value : 'components/' + tag.value + '/component.html';
+        customElement.href = href ? href.value : 'components/' + tag.value + '/component.html';
         customElement.shadowClass = shadowClass ? shadowClass.value : defaultClass;
 
         /**
