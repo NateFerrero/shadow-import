@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+    <script src="../../shadow-import.js"></script>
+    <shadow-import tag="hero-section" href="components/hero-element/view.html"></shadow-import>
+</head>
+<body>
+    <hero-section background-color="#ace">
+        <h1>Shadow Import</h1>
+        <p>Flexible, simple, and powerful.</p>
+    </hero-section>
+
+    <p>Three different ways of setting attributes:</p>
+    <button onclick="document.querySelector('hero-section').attributes.getNamedItem('background-color').value = '#ace'">Blue (Direct DOM)</button>
+    <button onclick="document.querySelector('hero-section').shadowComponent.setColor('#8fa')">Green (Component Method)</button>
+    <button onclick="document.querySelector('hero-section').shadowComponent.attrs.set('background-color', '#f66')">Red (Component Attrs)</button>
+</body>
+</html>

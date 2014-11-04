@@ -1,0 +1,42 @@
+<script>
+    ShadowComponent(function (cls, proto) {
+        proto.init = function () {
+            /**
+             * Reference the <section>
+             */
+            var section = this.el.querySelector('section');
+
+            /**
+             * Append the content
+             */
+            section.appendChild(this.content);
+
+            /**
+             * Keep the background color up-to-date with the attribute
+             */
+            this.attrs.watch('background-color', function (color) {
+                section.style.backgroundColor = color;
+            });
+        };
+
+        /**
+         * Set color
+         */
+        proto.setColor = function (color) {
+            this.attrs.set('background-color', color);
+        };
+    });
+</script>
+<template>
+    <style>
+        section {
+            margin: 1em 0;
+            padding: 3em;
+            text-align: center;
+            font-size: 200%;
+            font-family: sans-serif;
+            text-shadow: 0 3px 10px rgba(255, 255, 255, 0.5);
+        }
+    </style>
+    <section></section>
+</template>

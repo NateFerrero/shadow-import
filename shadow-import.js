@@ -23,8 +23,11 @@
             throw new Error("ShadowComponent() called without a function as the first argument");
         }
 
-        component = function ShadowComponent () {
-            this.init && this.init.apply(this, arguments);
+        component = function ShadowComponent (el, attrs, content) {
+            this.el = el;
+            this.attrs = attrs;
+            this.content = content;
+            typeof this.init === 'function' && this.init();
         };
 
         fn(component, component.prototype);
@@ -34,37 +37,42 @@
      * Attributes on the custom element
      */
     var ShadowAttributes = function (elem) {
-        var len = elem.attributes.length;
-        this.$$elem = elem;
-        this.$$watchers = {};
+        this.$elem = elem;
+        this.$watchers = {};
+    };
+
+    ShadowAttributes.prototype.init = function () {
+        var len = this.$elem.attributes.length;
         for (var i = 0; i < len; i++) {
-            this.$changed(elem.attributes[i].name, elem.attributes[i].value, undefined);
+            this.changed(this.$elem.attributes[i].name, this.$elem.attributes[i].value, undefined);
         }
     };
 
-    ShadowAttributes.prototype.$get = function (attrName, def) {
-        var attr = this[attrName];
-        return attr !== undefined && attr !== null ? attr : def;
+    ShadowAttributes.prototype.get = function (attrName, def) {
+        var attr = this.$elem.getNamedItem(attrName);
+        return attr ? attr.value : def;
     };
 
-    ShadowAttributes.prototype.$changed = function (attrName, newVal, oldVal) {
-        this[attrName] = newVal;
-        if (Array.isArray(this.$$watchers[attrName])) {
-            this.$$watchers[attrName].forEach(function (watcher) {
-                watcher.call(this.$$elem.component, newVal, oldVal);
+    ShadowAttributes.prototype.set = function (attrName, val) {
+        var attr = document.createAttribute(attrName);
+        attr.value = val;
+        return this.$elem.attributes.setNamedItem(attr);
+    };
+
+    ShadowAttributes.prototype.changed = function (attrName, newVal, oldVal) {
+        if (Array.isArray(this.$watchers[attrName])) {
+            this.$watchers[attrName].forEach(function (watcher) {
+                watcher.call(this.$elem.shadowComponent, newVal, oldVal);
             }, this);
         }
     };
 
-    ShadowAttributes.prototype.$watch = function (attrName, fn) {
-        if (!Array.isArray(this.$$watchers[attrName])) {
-            this.$$watchers[attrName] = [];
+    ShadowAttributes.prototype.watch = function (attrName, fn) {
+        if (!Array.isArray(this.$watchers[attrName])) {
+            this.$watchers[attrName] = [];
         }
 
-        this.$$watchers[attrName].push(fn);
-        setTimeout(function () {
-            fn.call(this.$$elem.component, this.$get(attrName), undefined)
-        }.bind(this));
+        this.$watchers[attrName].push(fn);
     };
 
     /**
@@ -121,9 +129,10 @@
 
         /**
          * Callback for any attribute changes
+         * Note the reversed order (many use cases will not need the argument oldVal)
          */
         customElement.attributeChangedCallback = function (attrName, oldVal, newVal) {
-            this.shadowAttributes.$changed(attrName, newVal, oldVal);
+            this.shadowAttributes.changed(attrName, newVal, oldVal);
         };
         
         /**
@@ -212,7 +221,8 @@
                          * Finally, instantiate the new component class with the custom element node
                          * and the attribute manager
                          */
-                        elem.component = new CustomClass(elem.shadowRoot, elem.shadowAttributes);
+                        elem.shadowComponent = new CustomClass(elem.shadowRoot, elem.shadowAttributes, elem.content);
+                        elem.shadowAttributes.init();
                     };
 
                     /**
