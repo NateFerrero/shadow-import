@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+<head>
+    <title>&lt;shadow-import&gt; Example</title>
+    <script src="../../polyfills/webcomponents.min.js"></script>
+    <script src="../../shadow-import.js"></script>
+    <script src="angular.min.js"></script>
+
+    <shadow-import tag="name-input" href="components/name-form/component.html"></shadow-import>
+
+    <script>
+        var myApp = angular.module('myApp', []);
+        myApp.controller('myCtrl', function ($scope, $timeout) {
+            $scope.myName = 'Eriksson';
+
+            $timeout(function () {
+                $scope.myName = 'Eriksson the Epic';
+            }, 2000);
+        });
+
+        myApp.directive('ngShadow', function ($parse) {
+            return {
+                restrict: 'A',
+                link: function (scope, el, attrs) {
+                    var shadowAttrs = el[0].shadowAttributes;
+                    if (!shadowAttrs) {
+                        console.error('The following error applies to', el[0]);
+                        throw new Error('The directive ng-shadow can only be used on elements created with <shadow-import>');
+                    }
+                    Object.keys(attrs.$attr).forEach(function (key) {
+                        if (key && key[0] === '+') {
+                            var attr = attrs.$attr[key];
+                            var attrName = attr.replace(/^\++/, '');
+
+                            /**
+                             * Sync from scope --> shadowAttrs
+                             */
+                            var firstRun = true;
+                            var getter = $parse(attrs[attr]);
+                            var setter = getter.assign;
+
+                            Object.defineProperty(shadowAttrs, attr, {
+                                enumerable: false,
+                                get: function () { }
+                            });
+
+                            Object.defineProperty(shadowAttrs, attrName, {
+                                enumerable: true,
+                                get: function () {
+                                    return getter(scope);
+                                },
+                                set: function (val) {
+                                    setter(scope, val);
+                                    scope.$$phase || scope.$apply();
+                                }
+                            });
+
+                            scope.$watch(attrs[attr], function (newVal, oldVal) {
+                                if (firstRun || newVal !== oldVal || !angular.equals(newVal, oldVal)) {
+                                    firstRun = false;
+                                    shadowAttrs.$changed(attrName, newVal, oldVal);
+                                }
+                            }, key[1] === '+' /* deep watch on ++attr */);
+                        }
+                    });
+                }
+            };
+        });
+    </script>
+</head>
+<body ng-app="myApp">
+    <section ng-controller="myCtrl">
+        <h3>Angular:</h3>
+        <name-input ng-shadow +name="myName"></name-input>
+        <p>Hello, {{myName || "guest"}}!</p>
+
+        <hr />
+
+        <h3>Non-Angular:</h3>
+        <name-input name="Nate Ferrero"></name-input>
+    </section>
+</body>
+</html>

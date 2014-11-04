@@ -34,31 +34,36 @@
      * Attributes on the custom element
      */
     var ShadowAttributes = function (elem) {
-        this.elem = elem;
-        this.watchers = {};
+        var len = elem.attributes.length;
+        this.$$elem = elem;
+        this.$$watchers = {};
+        for (var i = 0; i < len; i++) {
+            this.$changed(elem.attributes[i].name, elem.attributes[i].value, undefined);
+        }
     };
 
-    ShadowAttributes.prototype.get = function (attrName, def) {
-        var attr = this.elem.attributes.getNamedItem(attrName);
-        return attr ? attr.value : def;
+    ShadowAttributes.prototype.$get = function (attrName, def) {
+        var attr = this[attrName];
+        return attr !== undefined && attr !== null ? attr : def;
     };
 
-    ShadowAttributes.prototype.changed = function (attrName, oldVal, newVal) {
-        if (Array.isArray(this.watchers[attrName])) {
-            this.watchers[attrName].forEach(function (watcher) {
-                watcher.call(this.elem.component, oldVal, newVal);
+    ShadowAttributes.prototype.$changed = function (attrName, newVal, oldVal) {
+        this[attrName] = newVal;
+        if (Array.isArray(this.$$watchers[attrName])) {
+            this.$$watchers[attrName].forEach(function (watcher) {
+                watcher.call(this.$$elem.component, newVal, oldVal);
             }, this);
         }
     };
 
-    ShadowAttributes.prototype.watch = function (attrName, fn) {
-        if (!Array.isArray(this.watchers[attrName])) {
-            this.watchers[attrName] = [];
+    ShadowAttributes.prototype.$watch = function (attrName, fn) {
+        if (!Array.isArray(this.$$watchers[attrName])) {
+            this.$$watchers[attrName] = [];
         }
 
-        this.watchers[attrName].push(fn);
+        this.$$watchers[attrName].push(fn);
         setTimeout(function () {
-            fn.call(this.elem.component, undefined, this.get(attrName))
+            fn.call(this.$$elem.component, this.$get(attrName), undefined)
         }.bind(this));
     };
 
@@ -118,7 +123,7 @@
          * Callback for any attribute changes
          */
         customElement.attributeChangedCallback = function (attrName, oldVal, newVal) {
-            this.shadowAttributes.changed(attrName, oldVal, newVal);
+            this.shadowAttributes.$changed(attrName, newVal, oldVal);
         };
         
         /**

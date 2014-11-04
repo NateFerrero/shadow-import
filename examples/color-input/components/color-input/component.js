@@ -10,7 +10,7 @@ ShadowComponent(function (cls, proto) {
         this.iStyle = this.el.querySelector('input').style;
         this.iStyle.padding = '6px';
 
-        this.attrs.watch('border-color', this.updateBorder);
+        this.attrs.$watch('border-color', this.updateBorder);
 
         setTimeout(function () {
             this.darkMode();
@@ -20,7 +20,7 @@ ShadowComponent(function (cls, proto) {
     };
 
     proto.updateBorder = function () {
-        this.iStyle.border = '2px solid ' + this.attrs.get('border-color', '#000');
+        this.iStyle.border = '2px solid ' + this.attrs.$get('border-color', '#000');
     };
 
     proto.darkMode = function () {
