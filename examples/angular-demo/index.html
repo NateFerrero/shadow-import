@@ -2,82 +2,68 @@
 <html>
 <head>
     <title>&lt;shadow-import&gt; Example</title>
-    <script src="../../polyfills/webcomponents.min.js"></script>
-    <script src="../../shadow-import.js"></script>
     <script src="angular.min.js"></script>
+    <script src="../../polyfills/webcomponents.min.js"></script>
+    <script src="../../angular/ng-shadow.js"></script>
+    <script src="../../shadow-import.js"></script>
 
     <shadow-import tag="name-input" href="components/name-form/component.html"></shadow-import>
 
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 2em;
+        }
+
+        hr {
+            margin: 2em 0;
+            border: 3px solid #ddd;
+        }
+
+        name-input {
+            margin: 1em 0;
+            padding: 2em;
+            background: #ffe;
+            display: inline-block;
+            border: 1px solid #cc9;
+        }
+    </style>
+
     <script>
-        var myApp = angular.module('myApp', []);
+        var myApp = angular.module('myApp', ['ngShadow']);
         myApp.controller('myCtrl', function ($scope, $timeout) {
             $scope.myName = 'Eriksson';
+            $scope.otherName = 'Sven';
 
             $timeout(function () {
                 $scope.myName = 'Eriksson the Epic';
+                $scope.otherName = 'Sven the Spartan';
             }, 2000);
-        });
-
-        myApp.directive('ngShadow', function ($parse) {
-            return {
-                restrict: 'A',
-                link: function (scope, el, attrs) {
-                    var shadowAttrs = el[0].shadowAttributes;
-                    if (!shadowAttrs) {
-                        console.error('The following error applies to', el[0]);
-                        throw new Error('The directive ng-shadow can only be used on elements created with <shadow-import>');
-                    }
-                    Object.keys(attrs.$attr).forEach(function (key) {
-                        if (key && key[0] === '+') {
-                            var attr = attrs.$attr[key];
-                            var attrName = attr.replace(/^\++/, '');
-
-                            /**
-                             * Sync from scope --> shadowAttrs
-                             */
-                            var firstRun = true;
-                            var getter = $parse(attrs[attr]);
-                            var setter = getter.assign;
-
-                            Object.defineProperty(shadowAttrs, attr, {
-                                enumerable: false,
-                                get: function () { }
-                            });
-
-                            Object.defineProperty(shadowAttrs, attrName, {
-                                enumerable: true,
-                                get: function () {
-                                    return getter(scope);
-                                },
-                                set: function (val) {
-                                    setter(scope, val);
-                                    scope.$$phase || scope.$apply();
-                                }
-                            });
-
-                            scope.$watch(attrs[attr], function (newVal, oldVal) {
-                                if (firstRun || newVal !== oldVal || !angular.equals(newVal, oldVal)) {
-                                    firstRun = false;
-                                    shadowAttrs.$changed(attrName, newVal, oldVal);
-                                }
-                            }, key[1] === '+' /* deep watch on ++attr */);
-                        }
-                    });
-                }
-            };
         });
     </script>
 </head>
 <body ng-app="myApp">
     <section ng-controller="myCtrl">
-        <h3>Angular:</h3>
+        <h3>Two-Way Binding</h3>
+        <p>Here, we use <code>+name="myName"</code> (would be <code>++name="myName"</code> for a deep watch) to create a two-way binding between <code>$scope.myName</code> and <code>attrs.name</code> in the imported component.</p>
+        <ul>
+            <li>The component is rendered</li>
+            <li>Changes on scope are immediately reflected in the component</li>
+            <li>Changes to the name attribute in the component are reflected in the scope</li>
+        </ul>
         <name-input ng-shadow +name="myName"></name-input>
-        <p>Hello, {{myName || "guest"}}!</p>
+        <p>Hello, {{myName}}!</p>
 
         <hr />
 
-        <h3>Non-Angular:</h3>
-        <name-input name="Nate Ferrero"></name-input>
+        <h3>One-Way Binding</h3>
+        <p>In this case, the attribute is just passed in as a string. We have one-way binding of strings only through the attribute.</p>
+        <ul>
+            <li>The component is rendered</li>
+            <li>Changes on scope are immediately reflected in the component</li>
+        </ul>
+        <name-input name="{{otherName}}"></name-input>
+        <p>Hello, {{otherName}}!</p>
     </section>
 </body>
 </html>
