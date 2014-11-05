@@ -36,4 +36,4 @@ For example, importing and using an existing component:
 
 To view the result of this example, [click here](http://nateferrero.github.io/shadow-import/examples/hero/).
 
-For more examples, and for documentation on writing a ShadowComponent, visit the [http://nateferrero.github.io/shadow-import/](ShadowComponent Documentation).
+For more examples, and for documentation on writing a ShadowComponent, visit the [ShadowComponent Documentation](http://nateferrero.github.io/shadow-import/).
