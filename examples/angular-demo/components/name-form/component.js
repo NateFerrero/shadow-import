@@ -1,16 +1,15 @@
 ShadowComponent(function (cls, proto) {
-    proto.init = function (el, attrs) {
+    proto.init = function () {
+        var nameLabel = this.el.getElementById('name');
+        var nameInput = this.el.getElementById('name-input');
 
-        var nameLabel = el.getElementById('name');
-        var nameInput = el.getElementById('name-input');
-
-        attrs.$watch('name', function (name) {
+        this.attrs.watch('name', function (name) {
             nameLabel.innerText = name || '';
             nameInput.value = name;
         });
 
         nameInput.addEventListener('change', function (event) {
-            attrs.name = nameInput.value;
-        });
+            this.attrs.set('name', nameInput.value);
+        }.bind(this));
     };
 });

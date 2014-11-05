@@ -1,18 +1,17 @@
 <!doctype html>
 <html>
 <head>
-    <title>&lt;shadow-import&gt; Example</title>
+    <title>&lt;shadow-import&gt; Color Input Example</title>
     <script src="../../polyfills/webcomponents.min.js"></script>
     <script src="../../shadow-import.js"></script>
 
     <shadow-import tag="color-input" href="components/color-input/component.html"></shadow-import>
     <shadow-import tag="color-input-2" href="components/color-input/component-alt.html"></shadow-import>
-    <shadow-import tag="json-render"></shadow-import>
 </head>
 <body>
     <color-input border-color="red"></color-input>
 
-    <color-input-2 border-color="purple"></color-input-2>
+    <color-input border-color="purple"></color-input>
 
     <color-input border-color="blue"></color-input>
 
@@ -20,7 +19,7 @@
 
     <color-input border-color="yellow"></color-input>
 
-    <color-input border-color="orange"></color-input>
+    <color-input-2 border-color="orange"></color-input-2>
 
     <p>
         <input value="This is not a custom element" />

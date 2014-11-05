@@ -49,7 +49,7 @@
     };
 
     ShadowAttributes.prototype.get = function (attrName, def) {
-        var attr = this.$elem.getNamedItem(attrName);
+        var attr = this.$elem.attributes.getNamedItem(attrName);
         return attr ? attr.value : def;
     };
 

@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>&lt;shadow-import&gt; Example</title>
+    <title>&lt;shadow-import&gt; Angular.js Example</title>
     <script src="angular.min.js"></script>
     <script src="../../polyfills/webcomponents.min.js"></script>
     <script src="../../angular/ng-shadow.js"></script>
@@ -43,12 +43,17 @@
     </script>
 </head>
 <body ng-app="myApp">
+
     <section ng-controller="myCtrl">
         <h3>Two-Way Binding</h3>
+
+        <h1 style="color: red;">Note: ng-shadow is currently broken again, and the API is not stable, don't use this just yet!</h1>
+
         <p>Here, we use <code>+name="myName"</code> (would be <code>++name="myName"</code> for a deep watch) to create a two-way binding between <code>$scope.myName</code> and <code>attrs.name</code> in the imported component.</p>
         <ul>
             <li>The component is rendered</li>
             <li>Changes on scope are immediately reflected in the component</li>
+            <li>Changes to the name attribute in the component are reflected in the component</li>
             <li>Changes to the name attribute in the component are reflected in the scope</li>
         </ul>
         <name-input ng-shadow +name="myName"></name-input>
@@ -57,10 +62,15 @@
         <hr />
 
         <h3>One-Way Binding</h3>
+
+        <h1 style="color: green;">This way is OK to use!</h1>
+
         <p>In this case, the attribute is just passed in as a string. We have one-way binding of strings only through the attribute.</p>
         <ul>
             <li>The component is rendered</li>
             <li>Changes on scope are immediately reflected in the component</li>
+            <li>Changes to the name attribute in the component are reflected in the component</li>
+            <li>Changes to the name attribute in the component are <b>not</b> reflected in the angular scope</li>
         </ul>
         <name-input name="{{otherName}}"></name-input>
         <p>Hello, {{otherName}}!</p>

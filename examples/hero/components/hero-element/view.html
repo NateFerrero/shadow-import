@@ -2,20 +2,15 @@
     ShadowComponent(function (cls, proto) {
         proto.init = function () {
             /**
-             * Reference the <section>
-             */
-            var section = this.el.querySelector('section');
-
-            /**
              * Append the content
              */
-            section.appendChild(this.content);
+            this.el.appendChild(this.content);
 
             /**
              * Keep the background color up-to-date with the attribute
              */
             this.attrs.watch('background-color', function (color) {
-                section.style.backgroundColor = color;
+                this.el.host.style.backgroundColor = color;
             });
         };
 
@@ -29,14 +24,22 @@
 </script>
 <template>
     <style>
-        section {
+        :host {
+            display: block;
             margin: 1em 0;
-            padding: 3em;
+            padding: 2em;
             text-align: center;
             font-size: 200%;
             font-family: sans-serif;
-            text-shadow: 0 3px 10px rgba(255, 255, 255, 0.5);
+            text-shadow: 0 1px 20px rgba(255, 255, 255, 0.5);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        p {
+            margin-bottom: 0;
         }
     </style>
-    <section></section>
 </template>

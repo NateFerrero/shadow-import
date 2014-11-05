@@ -3,7 +3,7 @@
 
 HTML5 Web Components Automated
 
-### Introduction
+## Introduction
 
 [Web Components](http://webcomponents.org/) are here to stay. However, there is currently some level of complication [needed](http://webcomponents.org/resources/) when setting up a boilerplate element. `<shadow-import>` has the following features to make life simple again:
 
@@ -12,7 +12,7 @@ HTML5 Web Components Automated
 - easy to use with Angular.js
 - custom templating, works with all frameworks
 
-### The Syntax
+## The Syntax
 
 Using `<shadow-import>` is incredibly simple.
 
@@ -36,6 +36,6 @@ For example, importing and using an existing component:
 
 To view the result of this example, [click here](http://nateferrero.github.io/shadow-import/examples/hero/).
 
-### Writing a Component
+## Writing a Component
 
 

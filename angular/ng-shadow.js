@@ -44,7 +44,7 @@ angular.module('ngShadow', [])
                     scope.$watch(attrs[attr], function (newVal, oldVal) {
                         if (firstRun || newVal !== oldVal || !angular.equals(newVal, oldVal)) {
                             firstRun = false;
-                            shadowAttrs.$changed(attrName, newVal, oldVal);
+                            shadowAttrs.changed(attrName, newVal, oldVal);
                         }
                     }, key[1] === '+' /* deep watch on ++attr */);
                 }

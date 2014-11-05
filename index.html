@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+    <title>ShadowComponent Documentation</title>
+    <script src="../../shadow-import.js"></script>
+    <shadow-import tag="hero-section" href="examples/hero/components/hero-element/view.html"></shadow-import>
+    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700' rel='stylesheet' type='text/css'>
+    <link href='style/typicons/typicons.min.css' rel='stylesheet' type='text/css'>
+    <link href='style/style.css' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+<body>
+    <header>
+        <span class="title">ShadowComponent Documentation</span>
+        <a title="GitHub Project" href="https://github.com/NateFerrero/shadow-import"><span class="typcn typcn-social-github"></span></a>
+        <a title="Follow me on Twitter" href="https://twitter.com/NateFerrero"><span class="typcn typcn-social-twitter"></span></a>
+    </header>
+
+    <hero-section background-color="#FF895A">
+        <h1><code>&lt;shadow-import&gt;</code></h1>
+        <p>Web Components for the rest of us.</p>
+    </hero-section>
+
+    <article>
+        <h1>Quick Start</h1>
+
+        <pre><code>&lt;head&gt;
+    &lt;script src=&quot;shadow-import/polyfills/webcomponents.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;shadow-import/shadow-import.js&quot;&gt;&lt;/script&gt;
+    &lt;shadow-import tag=&quot;<i>tag-name</i>&quot; href=&quot;<i>template-url</i>&quot;&gt;&lt;/shadow-import&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;<i>tag-name</i>&gt;&lt;/<i>tag-name</i>&gt;
+&lt;/body&gt;
+</code></pre>
+        
+        <h1>Creating a ShadowComponent</h1>
+        <h2><span class="typcn typcn-document"></span> my-component/view.html (this is the <code><i>template-url</i></code> imported above)</h2>
+
+        <pre><code>&lt;script src=&quot;component.js&quot;&gt;&lt;/script&gt;
+&lt;template&gt;
+    &lt;style&gt;
+        :host {
+            /* add styles to the host tag here */
+        }
+        
+        /* add all other styles for the HTML tag content here */
+    &lt;/style&gt;
+
+    &lt;!-- add HTML tag content here --&gt;
+&lt;/template&gt;
+</code></pre>
+
+        <h2><span class="typcn typcn-document"></span> my-component/component.js</h2>
+
+        <pre><code>ShadowComponent(function (cls, proto) {
+    proto.init = function () {
+        this.el.host;   // refers to the host element (as imported, e.g.
+                        //   &lt;tag-name&gt;&lt;/tag-name&gt;)
+
+        this.el;        // refers to the shadow root (contains the
+                        //   contents of &lt;template&gt;&lt;/template&gt;)
+
+        this.attrs;     // manage attributes on the host element, usage:
+                        //   this.attrs.set(attrName, value)
+                        //   this.attrs.get(attrName, default)
+                        //   this.attrs.watch(attrName, function (newVal, oldVal) { ... })
+
+        this.content;   // a DocumentFragment containing any content used in the tag,
+                        //   e.g. &lt;tag-name&gt;&lt;p&gt;This content.&lt;/p&gt;&lt;/tag-name&gt;
+                        //   To include this in your component, use:
+                        //   this.el.appendChild(this.content);
+    };
+});
+</code></pre>
+
+    </article>
+
+    <article>
+        <h1>Examples</h1>
+        <ul>
+            <li><a href="examples/hero/">Hero Element Example</a></li>
+            <li><a href="examples/color-input/">Multiple Templates Example</a></li>
+            <li><a href="examples/angular-demo">Angular.js Integration Example</a></li>
+        </ul>
+    </article>
+</body>
+</html>

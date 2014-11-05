@@ -3,14 +3,13 @@ ShadowComponent(function (cls, proto) {
     /**
      * Constructor
      */
-    proto.init = function (el, attrs) {
-        this.el = el;
-        this.attrs = attrs;
-
-        this.iStyle = this.el.querySelector('input').style;
+    proto.init = function () {
+        var input = this.el.querySelector('input');
+        input.value = Math.ceil(Math.random() * 1000);
+        this.iStyle = input.style;
         this.iStyle.padding = '6px';
 
-        this.attrs.$watch('border-color', this.updateBorder);
+        this.attrs.watch('border-color', this.updateBorder);
 
         setTimeout(function () {
             this.darkMode();
@@ -20,13 +19,11 @@ ShadowComponent(function (cls, proto) {
     };
 
     proto.updateBorder = function () {
-        this.iStyle.border = '2px solid ' + this.attrs.$get('border-color', '#000');
+        this.iStyle.border = '2px solid ' + this.attrs.get('border-color', '#000');
     };
 
     proto.darkMode = function () {
-        this.iStyle.background = '#ccc';
+        this.iStyle.background = '#333';
         this.iStyle.color = '#fff';
     };
-
-    return cls;
 });
